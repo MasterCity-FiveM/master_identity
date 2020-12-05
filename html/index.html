@@ -3,59 +3,48 @@
 		<script src="nui://game/ui/jquery.js" type="text/javascript"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		
 		<link href="css/style.css" rel="stylesheet" type="text/css" />
 	</head>
 
 	<body onkeydown="TriggeredKey(this)">
+		<video id="myVideo">
+		<source src="" type="video/mp4"> -->
+		</video>
 		<div class="dialog">
-			<img id="logo" src="img/esx_identity.png" height="110px" width="332px">
+			<img id="logo" src="img/logo.png">
 			<form id="register" name="register" action="#">
-				<input id="firstname" type="text" class="" name="firstname" placeholder="First Name (Max 16 Characters)" onKeyDown="if(this.value.length==16 && event.keyCode!=8) return false;" onkeypress="if (isNumber(event) == true) return false;" onKeyUp="checkFirstName()" onmouseup="checkFirstName()"><br>
-				<input id="lastname" type="text" class="" name="lastname" placeholder="Last Name (Max 16 Characters)" onKeyDown="if(this.value.length==16 && event.keyCode!=8) return false;" onkeypress="if (isNumber(event) == true) return false;" onKeyUp="checkLastName()" onmouseup="checkLastName()"><br>
-				<input id="dateofbirth" type="text" name="dateofbirth" class="" placeholder="Date of Birth (MM/DD/YYYY)" dateformat="M d y" min="01/01/1900" max="12/31/2020" onfocus="(this.type='date')" onkeypress="if ( isNaN(String.fromCharCode(event.keyCode) )) return false;" onchange="checkDOB()" onKeyUp="checkDOB()" onmouseup="checkDOB()"><br>
-				<center>
-					<div class="radio-toolbar">
-						<input type="radio" id="radiom" name="sex" value="m" checked>
-						<label for="radiom">Male</label>
+
+				<div id='getPhone'>
+					<input id="phone" type="text" class="" name="phone" placeholder="شماره موبایل (مانند: 09151234567)" onKeyDown="if(this.value.length==11 && event.keyCode!=8) return false;" onkeypress="if (!isNumber(event) == true) return false;" onKeyUp="checkPhone()" onmouseup="checkPhone()"><br>
+					<button id="submit1" type="submit"><font size="5px">دریافت کد از طریق پیامک</font></button>
+				</div>
+
+				<div id='RegisterForm' class="hide-class">
+					<input id="code" type="text" class="" name="code" placeholder="کد 6 رقمی ارسال شده به تلفن همراه" onKeyDown="if(this.value.length==6 && event.keyCode!=8) return false;" onkeypress="if (!isNumber(event) == true) return false;" onKeyUp="checkCode()" onmouseup="checkCode()"><br>
+					<input id="firstname" type="text" class="" name="firstname" placeholder="نام شما (حداکثر 16 حرف)" onKeyDown="if(this.value.length==16 && event.keyCode!=8) return false;" onkeypress="if (isNumber(event) == true) return false;" onKeyUp="checkFirstName()" onmouseup="checkFirstName()"><br>
+					<input id="lastname" type="text" class="" name="lastname" placeholder="نام خانوادگی (حداکثر 16 حرف)" onKeyDown="if(this.value.length==16 && event.keyCode!=8) return false;" onkeypress="if (isNumber(event) == true) return false;" onKeyUp="checkLastName()" onmouseup="checkLastName()"><br>
+					<center>
+						<div class="radio-toolbar">
+							<input type="radio" id="radiom" name="sex" value="m" checked>
+							<label for="radiom">مرد</label>
+						
+							<input type="radio" id="radiof" name="sex" value="f">
+							<label for="radiof">زن</label>
+						</div>
+					</center>
 					
-						<input type="radio" id="radiof" name="sex" value="f">
-						<label for="radiof">Female</label>
-					</div>
-				</center>
-					<div class="range-wrap" style="width: 80%;">
-						<input type="range" id="height" class="range" min="48" max="96" value="48">
-						<output class="bubble"></output>
-					</div>
-				<button id="submit" type="submit"><font size="5px">Submit</font></button>
+					<button id="submit" type="submit"><font size="5px">ثبت نام</font></button>
+				</div>
+
 			</form>
-			<center><font size="1px" color="red">If the submit button doesn't work, please ensure that you've entered the fields correctly.</font></center>
 		</div>
 		<script>
 
-			const allRanges = document.querySelectorAll(".range-wrap");
-			allRanges.forEach(wrap => {
-				const range = wrap.querySelector(".range");
-				const bubble = wrap.querySelector(".bubble");
-
-				range.addEventListener("input", () => {
-					setBubble(range, bubble);
-				});
-				setBubble(range, bubble);
-			});
-
-			function setBubble(range, bubble) {
-				const val = range.value;
-				const min = range.min ? range.min : 0;
-				const max = range.max ? range.max : 100;
-				const newVal = Number(((val - min) * 100) / (max - min));
-				bubble.innerHTML = 'Height: ' + val;
-				bubble.style.left = `calc(${newVal}% + (${8 - newVal * 0.15}px))`;
-			}
-		
 			var myFirstName = document.getElementById('firstname');
 			var myLastName = document.getElementById('lastname');
-			var myDOB = document.getElementById('dateofbirth');
-			var myHeight = document.getElementById('height');
+			var myPhone = document.getElementById('phone');
+			var myCode = document.getElementById('code');
 
 			function isNumber(e) {
 				var key=e.which || e.KeyCode;
@@ -64,6 +53,53 @@
 				}
 				else {
 					return false;
+				}
+			}
+
+			
+			$(document).ready(function() {
+				$("#submit1").click(function(){
+					var value = myPhone.value;
+					if(value.trim().match(/^[0-9]*$/) != null && value.length == 11) {
+						$("#getPhone").addClass('hide-class');
+						$("#RegisterForm").removeClass('hide-class');
+					}
+				});
+			});
+
+			function checkCode() {
+				var value = myCode.value;
+				if(value.trim().match(/^[0-9]*$/) == null) {
+					myCode.style.backgroundColor = '#E06666';
+					myCode.style.color = 'black';
+				}
+				else {
+					if(value.length == 6) {
+						myCode.style.backgroundColor = '#B6D7A8';
+						myCode.style.color = 'black';
+					}
+					else {
+						myCode.style.backgroundColor = '#E06666';
+						myCode.style.color = 'black';
+					}
+				}
+			}
+
+			function checkPhone() {
+				var value = myPhone.value;
+				if(value.trim().match(/^[0-9]*$/) == null) {
+					myPhone.style.backgroundColor = '#E06666';
+					myPhone.style.color = 'black';
+				}
+				else {
+					if(value.length == 11) {
+						myPhone.style.backgroundColor = '#B6D7A8';
+						myPhone.style.color = 'black';
+					}
+					else {
+						myPhone.style.backgroundColor = '#E06666';
+						myPhone.style.color = 'black';
+					}
 				}
 			}
 
@@ -103,55 +139,7 @@
 				}
 			}
 			
-			function checkDOB() {
-				var date = new Date($('#dateofbirth').val());
-				day = date.getDate();
-				month = date.getMonth() + 1;
-				year = date.getFullYear();
-				if (isNaN(month) || isNaN(day) || isNaN(year)) {
-					myDOB.style.backgroundColor = '#E06666';
-					myDOB.style.color = 'black';
-				}
-				else {
-					var dateInput = [month, day, year].join('/');
-
-					var regExp = /^(\d{1,2})(\/|-)(\d{1,2})(\/|-)(\d{4})$/;
-					var dateArray = dateInput.match(regExp);
-
-					if (dateArray == null){
-						return false;
-					}
-
-					month = dateArray[1];
-					day= dateArray[3];
-					year = dateArray[5];        
-
-					if (month < 1 || month > 12){
-						myDOB.style.backgroundColor = '#E06666';
-						myDOB.style.color = 'black';
-					}
-					else if (day < 1 || day> 31) { 
-						myDOB.style.backgroundColor = '#E06666';
-						myDOB.style.color = 'black';
-					}
-					else if ((month==4 || month==6 || month==9 || month==11) && day ==31) {
-						myDOB.style.backgroundColor = '#E06666';
-						myDOB.style.color = 'black';
-					}
-					else if (month == 2) {
-						var isLeapYear = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
-						if (day> 29 || (day ==29 && !isLeapYear)){
-							myDOB.style.backgroundColor = '#E06666';
-							myDOB.style.color = 'black';
-						}
-					}
-					else {
-						myDOB.style.backgroundColor = '#B6D7A8';
-						myDOB.style.color = 'black';	
-					}				
-				}
-			}
-
+			
 			function TriggeredKey(e) {
 				var keycode;
 				if (window.event) keycode = window.event.keyCode;

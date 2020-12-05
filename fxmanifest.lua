@@ -33,7 +33,7 @@ files {
 	'html/index.html',
 	'html/js/script.js',
 	'html/css/style.css',
-	'html/img/esx_identity.png'
+	'html/img/logo.png'
 }
 
 dependency 'es_extended'

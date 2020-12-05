@@ -9,7 +9,7 @@ Config.EnableCommands   = true
 -- Changes the identifiers from Rockstar License To Steam. In order to use this, you will have to have
 -- made edits to your ESX in order to use Steam identifiers all around, because new ESX uses Rockstar
 -- license. I just made it easier for people that convert to steam identifiers.
-Config.UseSteamID       = false 
+Config.UseSteamID       = true 
 
 -- [Config.UseDeferrals]
 -- EXPERIMENTAL Character Registration Method. This will allow players to create identities in deferrals
@@ -23,8 +23,10 @@ Config.UseDeferrals     = false -- EXPERIMENTAL Character Registration Method.
 Config.MaxNameLength    = 16
 Config.MinHeight        = 48
 Config.MaxHeight        = 96
-Config.LowestYear       = 1900
-Config.HighestYear      = 2020
+Config.LowestYear       = 1300
+Config.HighestYear      = 1400
+
+Config.webAPI      = 'http://127.0.0.1/'
 
 Config.FullCharDelete   = false
 Config.EnableDebugging  = false

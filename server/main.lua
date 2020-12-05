@@ -26,7 +26,7 @@ if Config.UseDeferrals then
 		end
 	
 		if identifier then
-			MySQL.Async.fetchAll('SELECT firstname, lastname, dateofbirth, sex, height FROM users WHERE identifier = @identifier', {
+			MySQL.Async.fetchAll('SELECT firstname, lastname, dateofbirth, sex, height, verified, phone FROM users WHERE identifier = @identifier', {
 				['@identifier'] = identifier
 			}, function(result)
 				if result[1] then
@@ -36,7 +36,10 @@ if Config.UseDeferrals then
 							lastName = result[1].lastname,
 							dateOfBirth = result[1].dateofbirth,
 							sex = result[1].sex,
-							height = result[1].height
+							height = result[1].height,
+							verified = result[1].verified,
+							phone = result[1].phone,
+							lastip = tostring(GetPlayerEndpoint(source))
 						}
 		
 						deferrals.done()
@@ -138,17 +141,20 @@ elseif not Config.UseDeferrals then
 		end
 
 		if identifier then
-			MySQL.Async.fetchAll('SELECT firstname, lastname, dateofbirth, sex, height FROM users WHERE identifier = @identifier', {
+			MySQL.Async.fetchAll('SELECT firstname, lastname, dateofbirth, sex, height, phone, verified FROM users WHERE identifier = @identifier', {
 				['@identifier'] = identifier
 			}, function(result)
 				if result[1] then
-					if result[1].firstname then
+					if result[1].firstname and result[1].verified == 1 then
 						playerIdentity[identifier] = {
 							firstName = result[1].firstname,
 							lastName = result[1].lastname,
 							dateOfBirth = result[1].dateofbirth,
 							sex = result[1].sex,
-							height = result[1].height
+							height = result[1].height,
+							verified = result[1].verified,
+							phone = result[1].phone,
+							lastip = tostring(GetPlayerEndpoint(source))
 						}
 
 						alreadyRegistered[identifier] = true
@@ -201,7 +207,10 @@ elseif not Config.UseDeferrals then
 			xPlayer.set('dateofbirth', currentIdentity.dateOfBirth)
 			xPlayer.set('sex', currentIdentity.sex)
 			xPlayer.set('height', currentIdentity.height)
-
+			xPlayer.set('verified', currentIdentity.verified)
+			xPlayer.set('phone', currentIdentity.phone)
+			xPlayer.set('lastip', tostring(GetPlayerEndpoint(xPlayer.source)))
+			
 			if currentIdentity.saveToDatabase then
 				saveIdentityToDatabase(xPlayer.identifier, currentIdentity)
 			end
@@ -217,32 +226,73 @@ elseif not Config.UseDeferrals then
 
 	ESX.RegisterServerCallback('esx_identity:registerIdentity', function(source, cb, data)
 		local xPlayer = ESX.GetPlayerFromId(source)
-		
 		if xPlayer then
 			if not alreadyRegistered[xPlayer.identifier] then
-				if checkNameFormat(data.firstname) and checkNameFormat(data.lastname) and checkSexFormat(data.sex) and checkDOBFormat(data.dateofbirth) and checkHeightFormat(data.height) then
-					playerIdentity[xPlayer.identifier] = {
-						firstName = formatName(data.firstname),
-						lastName = formatName(data.lastname),
-						dateOfBirth = data.dateofbirth,
-						sex = data.sex,
-						height = data.height
-					}
+				if checkPhoneFormat(data.phone) and not checkCodeFormat(data.code) then
+					MySQL.Async.fetchAll('SELECT phone FROM users WHERE phone = @phone', {
+						['@phone'] = data.phone
+					}, function(result)
+						if result[1] then
+							cb(false)
+						else
+							-- SEND SMS
+							local APIURL = Config.webAPI .. 'sendsms.php?phone=' .. data.phone
+							PerformHttpRequest(APIURL, function (errorCode, resultData, resultHeaders)
+								-- print("Returned error code:" .. tostring(errorCode))
+								-- print("Returned data:" .. tostring(resultData))
+								-- print("Returned result Headers:" .. tostring(resultHeaders))
+							end)
+							cb(false)
+						end
+					end)
+				elseif checkPhoneFormat(data.phone) and checkCodeFormat(data.code) and checkNameFormat(data.firstname) and checkNameFormat(data.lastname) and checkSexFormat(data.sex) then
+					MySQL.Async.fetchAll('SELECT phone FROM users WHERE phone = @phone', {
+						['@phone'] = data.phone
+					}, function(result)
+						if result[1] then
+							cb(false)
+						else
+							MySQL.Async.fetchAll('SELECT phone FROM verify_codes WHERE phone = @phone AND code = @code', {
+								['@phone'] = data.phone,
+								['@code'] = data.code
+							}, function(result)
+								if result[1] then
+									playerIdentity[xPlayer.identifier] = {
+										firstName = formatName(data.firstname),
+										lastName = formatName(data.lastname),
+										dateOfBirth = '2020-10-10',
+										sex = data.sex,
+										height = '70',
+										verified = '1',
+										phone = data.phone,
+										lastip = tostring(GetPlayerEndpoint(xPlayer.source))
+									}
+				
+									local currentIdentity = playerIdentity[xPlayer.identifier]
+				
+									xPlayer.setName(('%s %s'):format(currentIdentity.firstName, currentIdentity.lastName))
+									xPlayer.set('firstName', currentIdentity.firstName)
+									xPlayer.set('lastName', currentIdentity.lastName)
+									xPlayer.set('dateofbirth', '2020-10-10')
+									xPlayer.set('sex', currentIdentity.sex)
+									xPlayer.set('height', '70')
+									xPlayer.set('verified', '1')
+									xPlayer.set('phone', currentIdentity.phone)
+									xPlayer.set('lastip', tostring(GetPlayerEndpoint(xPlayer.source)))
+				
+									saveIdentityToDatabase(xPlayer.identifier, currentIdentity)
+									alreadyRegistered[xPlayer.identifier] = true
+							
+									playerIdentity[xPlayer.identifier] = nil
+									cb(true)
+								else
+									cb(false)
+								end
+							end)
+						end
+					end)
 
-					local currentIdentity = playerIdentity[xPlayer.identifier]
 
-					xPlayer.setName(('%s %s'):format(currentIdentity.firstName, currentIdentity.lastName))
-					xPlayer.set('firstName', currentIdentity.firstName)
-					xPlayer.set('lastName', currentIdentity.lastName)
-					xPlayer.set('dateofbirth', currentIdentity.dateOfBirth)
-					xPlayer.set('sex', currentIdentity.sex)
-					xPlayer.set('height', currentIdentity.height)
-
-					saveIdentityToDatabase(xPlayer.identifier, currentIdentity)
-					alreadyRegistered[xPlayer.identifier] = true
-			
-					playerIdentity[xPlayer.identifier] = nil
-					cb(true)
 				else
 					cb(false)
 				end
@@ -253,17 +303,20 @@ elseif not Config.UseDeferrals then
 	end)
 
 	function checkIdentity(xPlayer)
-		MySQL.Async.fetchAll('SELECT firstname, lastname, dateofbirth, sex, height FROM users WHERE identifier = @identifier', {
+		MySQL.Async.fetchAll('SELECT firstname, lastname, dateofbirth, sex, height, phone, verified FROM users WHERE identifier = @identifier', {
 			['@identifier'] = xPlayer.identifier
 		}, function(result)
 			if result[1] then
-				if result[1].firstname then
+				if result[1].firstname and result[1].verified == 1 then
 					playerIdentity[xPlayer.identifier] = {
 						firstName = result[1].firstname,
 						lastName = result[1].lastname,
 						dateOfBirth = result[1].dateofbirth,
 						sex = result[1].sex,
-						height = result[1].height
+						height = result[1].height,
+						verified = result[1].verified,
+						phone = result[1].phone,
+						lastip = tostring(GetPlayerEndpoint(xPlayer.source))
 					}
 
 					alreadyRegistered[xPlayer.identifier] = true
@@ -290,6 +343,9 @@ elseif not Config.UseDeferrals then
 			xPlayer.set('dateofbirth', currentIdentity.dateOfBirth)
 			xPlayer.set('sex', currentIdentity.sex)
 			xPlayer.set('height', currentIdentity.height)
+			xPlayer.set('verified', currentIdentity.verified)
+			xPlayer.set('phone', currentIdentity.phone)
+			xPlayer.set('lastip', tostring(GetPlayerEndpoint(xPlayer.source)))
 
 			if currentIdentity.saveToDatabase then
 				saveIdentityToDatabase(xPlayer.identifier, currentIdentity)
@@ -389,31 +445,39 @@ function deleteIdentity(xPlayer)
 		xPlayer.set('dateofbirth', nil)
 		xPlayer.set('sex', nil)
 		xPlayer.set('height', nil)
+		xPlayer.set('verified', nil)
+		xPlayer.set('phone', nil)
+		xPlayer.set('lastip', nil)
 
 		deleteIdentityFromDatabase(xPlayer)
 	end
 end
 
 function saveIdentityToDatabase(identifier, identity)
-	MySQL.Sync.execute('UPDATE users SET firstname = @firstname, lastname = @lastname, dateofbirth = @dateofbirth, sex = @sex, height = @height WHERE identifier = @identifier', {
+	MySQL.Sync.execute('UPDATE users SET firstname = @firstname, lastname = @lastname, dateofbirth = @dateofbirth, sex = @sex, height = @height, lastip = @lastip, verified = @verified, phone = @phone WHERE identifier = @identifier', {
 		['@identifier']  = identifier,
 		['@firstname'] = identity.firstName,
 		['@lastname'] = identity.lastName,
 		['@dateofbirth'] = identity.dateOfBirth,
 		['@sex'] = identity.sex,
-		['@height'] = identity.height
+		['@height'] = identity.height,
+		['@verified'] = identity.verified,
+		['@phone'] = identity.phone,
+		['@lastip'] = identity.lastip
 	})
 end
 
 function deleteIdentityFromDatabase(xPlayer)
-	MySQL.Sync.execute('UPDATE users SET firstname = @firstname, lastname = @lastname, dateofbirth = @dateofbirth, sex = @sex, height = @height , skin = @skin WHERE identifier = @identifier', {
+	MySQL.Sync.execute('UPDATE users SET firstname = @firstname, lastname = @lastname, dateofbirth = @dateofbirth, sex = @sex, height = @height , skin = @skin, verified = @verified, phone = @phone WHERE identifier = @identifier', {
 		['@identifier']  = xPlayer.identifier,
 		['@firstname'] = NULL,
 		['@lastname'] = NULL,
 		['@dateofbirth'] = NULL,
 		['@sex'] = NULL,
 		['@height'] = NULL,
-		['@skin'] = NULL
+		['@skin'] = NULL,
+		['@verified'] = '0',
+		['@phone'] = '0'
 	})
 
 	if Config.FullCharDelete then
@@ -454,6 +518,10 @@ function deleteIdentityFromDatabase(xPlayer)
 end
 
 function checkNameFormat(name)
+	if name == nil or name == '' then
+		return false
+	end
+
 	if not checkAlphanumeric(name) then
 		if not checkForNumbers(name) then
 			local stringLength = string.len(name)
@@ -480,6 +548,10 @@ function checkDOBFormat(dob)
 end
 
 function checkSexFormat(sex)
+	if sex == nil or sex == '' then
+		return false
+	end
+
 	if sex == "m" or sex == "M" or sex == "f" or sex == "F" then
 		return true
 	else
@@ -490,6 +562,33 @@ end
 function checkHeightFormat(height)
 	local numHeight = tonumber(height)
 	if numHeight < Config.MinHeight and numHeight > Config.MaxHeight then
+		return false
+	else
+		return true
+	end
+end
+
+
+function checkPhoneFormat(phone)
+	if phone == nil or phone == '' then
+		return false
+	end
+	
+	local Numphone = tonumber(phone)
+	if Numphone < 09000000000 and Numphone > 09999999999 then
+		return false
+	else
+		return true
+	end
+end
+
+function checkCodeFormat(code)
+	if code == nil or code == '' then
+		return false
+	end
+
+	local NumCode = tonumber(code)
+	if NumCode < 100000 and NumCode > 999999 then
 		return false
 	else
 		return true
