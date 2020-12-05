@@ -153,8 +153,7 @@ elseif not Config.UseDeferrals then
 							sex = result[1].sex,
 							height = result[1].height,
 							verified = result[1].verified,
-							phone = result[1].phone,
-							lastip = tostring(GetPlayerEndpoint(source))
+							phone = result[1].phone
 						}
 
 						alreadyRegistered[identifier] = true
@@ -454,17 +453,30 @@ function deleteIdentity(xPlayer)
 end
 
 function saveIdentityToDatabase(identifier, identity)
-	MySQL.Sync.execute('UPDATE users SET firstname = @firstname, lastname = @lastname, dateofbirth = @dateofbirth, sex = @sex, height = @height, lastip = @lastip, verified = @verified, phone = @phone WHERE identifier = @identifier', {
-		['@identifier']  = identifier,
-		['@firstname'] = identity.firstName,
-		['@lastname'] = identity.lastName,
-		['@dateofbirth'] = identity.dateOfBirth,
-		['@sex'] = identity.sex,
-		['@height'] = identity.height,
-		['@verified'] = identity.verified,
-		['@phone'] = identity.phone,
-		['@lastip'] = identity.lastip
-	})
+	if identity.lastip then
+		MySQL.Sync.execute('UPDATE users SET firstname = @firstname, lastname = @lastname, dateofbirth = @dateofbirth, sex = @sex, height = @height, lastip = @lastip, verified = @verified, phone = @phone WHERE identifier = @identifier', {
+			['@identifier']  = identifier,
+			['@firstname'] = identity.firstName,
+			['@lastname'] = identity.lastName,
+			['@dateofbirth'] = identity.dateOfBirth,
+			['@sex'] = identity.sex,
+			['@height'] = identity.height,
+			['@verified'] = identity.verified,
+			['@phone'] = identity.phone,
+			['@lastip'] = identity.lastip
+		})
+	else
+		MySQL.Sync.execute('UPDATE users SET firstname = @firstname, lastname = @lastname, dateofbirth = @dateofbirth, sex = @sex, height = @height, verified = @verified, phone = @phone WHERE identifier = @identifier', {
+			['@identifier']  = identifier,
+			['@firstname'] = identity.firstName,
+			['@lastname'] = identity.lastName,
+			['@dateofbirth'] = identity.dateOfBirth,
+			['@sex'] = identity.sex,
+			['@height'] = identity.height,
+			['@verified'] = identity.verified,
+			['@phone'] = identity.phone
+		})
+	end
 end
 
 function deleteIdentityFromDatabase(xPlayer)
