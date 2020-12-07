@@ -21,7 +21,7 @@ $(function() {
 	$("#register").submit(function(event) {
 		event.preventDefault(); // Prevent form from submitting
 
-		$.post('http://esx_identity/register', JSON.stringify({
+		$.post('http://master_identity/register', JSON.stringify({
 			firstname: $("#firstname").val(),
 			lastname: $("#lastname").val(),
 			phone: $("#phone").val(),

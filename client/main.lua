@@ -38,11 +38,13 @@ AddEventHandler('esx_identity:showRegisterIdentity', function()
 end)
 
 RegisterNUICallback('register', function(data, cb)
+	mk32_debug_clogger("Start esx_identity:registerIdentity from client")
 	ESX.TriggerServerCallback('esx_identity:registerIdentity', function(callback)
+		mk32_debug_clogger("Get submit!")
 		if callback then
 			mk32_debug_clogger("Registered!")
 			-- ESX.ShowNotification(_U('thank_you_for_registering'))
-			exports.pNotify:SendNotification({text = "به سرور مَسترسیتی خوش آمدید.", type = "success", timeout = 15000})
+			exports.pNotify:SendNotification({text = "به سرور مَسترسیتی خوش آمدید.", type = "success", timeout = 30000})
 			finished = false
 			EnableGui(false)
 			mk32_debug_clogger("Load ESX Skin!")
@@ -52,6 +54,21 @@ RegisterNUICallback('register', function(data, cb)
 			Wait(1000)
 		else
 			mk32_debug_clogger("Register error")
+			ESX.ShowNotification(_U('registration_error'))
+			Wait(1000)
+		end
+	end, data)
+end)
+
+RegisterNUICallback('register', function(data, cb)
+	ESX.TriggerServerCallback('esx_identity:registerIdentity', function(callback)
+		if callback then
+			ESX.ShowNotification(_U('thank_you_for_registering'))
+			EnableGui(false)
+			TriggerEvent('esx_skin:playerRegistered')
+			TriggerEvent('mskincreator:loadMenu')
+			Wait(1000)
+		else
 			ESX.ShowNotification(_U('registration_error'))
 		end
 	end, data)

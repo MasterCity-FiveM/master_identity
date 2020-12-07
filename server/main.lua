@@ -14,7 +14,7 @@ function checkIdentity(xPlayer)
 		['@identifier'] = xPlayer.identifier
 	}, function(result)
 		if result[1] then
-			if result[1].verified == 1 then
+			if tostring(result[1].verified) == '1' then
 				mk32_debug_logger("Character verified.")
 				xPlayer.setName(('%s %s'):format(result[1].firstName, result[1].lastName))
 				xPlayer.set('firstName', result[1].firstName)
@@ -22,12 +22,13 @@ function checkIdentity(xPlayer)
 				xPlayer.set('dateofbirth', '2020-10-10')
 				xPlayer.set('sex', result[1].sex)
 				xPlayer.set('height', '70')
-				xPlayer.set('verified', '1')
-				xPlayer.set('phone', result[1].phone)
+				xPlayer.set('verified', tostring('1'))
+				xPlayer.set('phone', tostring(result[1].phone))
 				
 				Citizen.Wait(1000)
 				TriggerClientEvent('esx_identity:alreadyRegistered', xPlayer.source)
 			else
+				xPlayer.set('verified', tostring('0'))
 				mk32_debug_logger("Registered but not verified.")
 				TriggerClientEvent('esx_identity:showRegisterIdentity', xPlayer.source)
 			end
@@ -43,7 +44,7 @@ ESX.RegisterServerCallback('esx_identity:registerIdentity', function(source, cb,
 	mk32_debug_logger("esx_identity:registerIdentity starting ...")
 	local xPlayer = ESX.GetPlayerFromId(source)
 	if xPlayer then
-		if not xPlayer.verified == '1' then
+		if xPlayer.verified == '0' then
 			mk32_debug_logger("Checking form submit!")
 			if checkPhoneFormat(data.phone) and not checkCodeFormat(data.code) then
 				mk32_debug_logger("Step 1, phone is valid.")
