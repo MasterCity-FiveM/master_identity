@@ -13,4 +13,4 @@ Config.MaxHeight        = 96
 
 Config.webAPI      = 'http://127.0.0.1/'
 
-Config.EnableDebugging  = true
+Config.EnableDebugging  = false
