@@ -46,13 +46,14 @@ ESX.RegisterServerCallback('esx_identity:registerIdentity', function(source, cb,
 	if xPlayer then
 		if xPlayer.verified == '0' then
 			mk32_debug_logger("Checking form submit!")
-			if checkPhoneFormat(data.phone) and not checkCodeFormat(data.code) then
+			if data.step and data.step == 'one' and checkPhoneFormat(data.phone) then
 				mk32_debug_logger("Step 1, phone is valid.")
 				MySQL.Async.fetchAll('SELECT phone FROM users WHERE phone = @phone', {
 					['@phone'] = data.phone
 				}, function(result)
 					if result[1] then
 						mk32_debug_logger("Phone number already exists!")
+						TriggerClientEvent('mk_idnt_error', source, 'phone_exists')
 						cb(false)
 					else
 						mk32_debug_logger("Sending SMS!")
@@ -63,10 +64,11 @@ ESX.RegisterServerCallback('esx_identity:registerIdentity', function(source, cb,
 							-- print("Returned data:" .. tostring(resultData))
 							-- print("Returned result Headers:" .. tostring(resultHeaders))
 						end)
+						TriggerClientEvent('mk_idnt_error', source, 'goto_step2')
 						cb(false)
 					end
 				end)
-			elseif checkPhoneFormat(data.phone) and checkCodeFormat(data.code) and checkNameFormat(data.firstname) and checkNameFormat(data.lastname) and checkSexFormat(data.sex) then
+			elseif data.step and data.step == 'two' and checkPhoneFormat(data.phone) and checkCodeFormat(data.code) and checkNameFormat(data.firstname) and checkNameFormat(data.lastname) and checkSexFormat(data.sex) then
 				mk32_debug_logger("Step 2, everything is look fine, check the phone number again!")
 				MySQL.Async.fetchAll('SELECT phone FROM users WHERE phone = @phone', {
 					['@phone'] = data.phone
@@ -108,14 +110,13 @@ ESX.RegisterServerCallback('esx_identity:registerIdentity', function(source, cb,
 								mk32_debug_logger("Register finished!")
 								cb(true)
 							else
+								TriggerClientEvent('mk_idnt_error', source, 'error_verify')
 								mk32_debug_logger("Code is not valid!")
 								cb(false)
 							end
 						end)
 					end
 				end)
-
-
 			else
 				cb(false)
 			end

@@ -30,6 +30,13 @@ function EnableGui(state)
 	})
 end
 
+RegisterNetEvent('mk_idnt_error')
+AddEventHandler('mk_idnt_error', function(action)
+	SendNUIMessage({
+		type = action
+	})
+end)
+
 RegisterNetEvent('esx_identity:showRegisterIdentity')
 AddEventHandler('esx_identity:showRegisterIdentity', function()
 	mk32_debug_clogger("Show GUI")
