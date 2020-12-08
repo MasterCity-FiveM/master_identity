@@ -27,7 +27,7 @@ function checkIdentity(xPlayer)
 				
 				Citizen.Wait(1000)
 				TriggerClientEvent('esx_identity:alreadyRegistered', xPlayer.source)
-				TriggerClientEvent("pNotify:SendNotification", _source, { text = "از ورود مجدد شما خرسندیم، امیدواریم لحظات خوبی داشته باشید.", type = "error", timeout = 15000, layout = "bottomCenter"})
+				TriggerClientEvent("pNotify:SendNotification", xPlayer.source, { text = "از ورود مجدد شما خرسندیم، امیدواریم لحظات خوبی داشته باشید.", type = "info", timeout = 15000, layout = "bottomCenter"})
 			else
 				xPlayer.set('verified', tostring('0'))
 				mk32_debug_logger("Registered but not verified.")
