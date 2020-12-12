@@ -70,7 +70,7 @@ end)
 RegisterNUICallback('register', function(data, cb)
 	ESX.TriggerServerCallback('esx_identity:registerIdentity', function(callback)
 		if callback then
-			ESX.ShowNotification(_U('thank_you_for_registering'))
+			-- ESX.ShowNotification(_U('thank_you_for_registering'))
 			EnableGui(false)
 			TriggerEvent('esx_skin:playerRegistered')
 			TriggerEvent('mskincreator:loadMenu')
