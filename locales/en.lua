@@ -22,12 +22,12 @@ Locales['en'] = {
   ['return_debug_xPlayer_get_first_name'] = "First Name: ~b~%s",
   ['return_debug_xPlayer_get_last_name'] = "Last Name: ~b~%s",
   ['return_debug_xPlayer_get_full_name'] = "Full Name: ~b~%s",
-  ['return_debug_xPlayer_get_sex'] = "Sex: ~b~%s",
-  ['return_debug_xPlayer_get_dob'] = "DOB: ~b~%s",
+  ['return_debug_xPlayer_get_sex'] = "جنسیت: ~b~%s",
+  ['return_debug_xPlayer_get_dob'] = "تاریخ تولد: ~b~%s",
   ['return_debug_xPlayer_get_height'] = "Height: ~b~%s Inches",
   ['data_incorrect'] = 'Data entered incorrectly. Please try again.',
   ['invalid_format'] = 'Data formatted incorrectly. Please try again.',
-  ['no_identifier'] = 'Lotfan Steam khod ra baz konid.',
+  ['no_identifier'] = 'لطفا استیم خود را باز کنید، و فایو ام خود را ری استارت کنید.',
   ['missing_identity'] = 'There was an error loading your character!\nError code: identity-missing\n\nIt seems like your identity is missing, try connecting again.',
   ['deleted_identity'] = 'Your character has been deleted. Please login again in order to create a new character.'
 }
