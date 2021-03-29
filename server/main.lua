@@ -42,6 +42,7 @@ function checkIdentity(xPlayer)
 end
 
 ESX.RegisterServerCallback('esx_identity:registerIdentity', function(source, cb, data)
+	ESX.RunCustomFunction("anti_ddos", source, 'esx_identity:registerIdentity', {data = data})
 	mk32_debug_logger("esx_identity:registerIdentity starting ...")
 	local xPlayer = ESX.GetPlayerFromId(source)
 	if xPlayer then
