@@ -21,16 +21,20 @@ var myPhone = document.getElementById('phone');
 var myCode = document.getElementById('code');
 
 
-$(function() {
+$(document).ready(function () {
+	$(".UI").hide();
+	
 	window.addEventListener('message', function(event) {
 		if (event.data.type == "enableui") {
-			document.body.style.display = event.data.enable ? "block" : "none";
 			const myVideo = document.getElementById('myVideo');
 			if(!event.data.enable)
 			{
+				$(".UI").hide();
 				myVideo.pause()
 				myVideo.setAttribute("src", '');	
 			}else{
+				$.post('http://master_identity/UILoaded', JSON.stringify({}));
+				$(".UI").show();
 				myVideo.setAttribute("src", 'https://mastercity.ir/files/register.webm');
 				myVideo.play()
 				myVideo.volume = 0.1;

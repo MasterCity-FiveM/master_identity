@@ -2,16 +2,25 @@ ESX = nil
 local loadingScreenFinished = false
 local guiEnabled = false
 local finished = true
+local viewLoaded = false
 
 Citizen.CreateThread(function()
 	while ESX == nil do
 		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 		Citizen.Wait(0)
 	end
+	
+	Citizen.Wait(5000)
+	
+	while not viewLoaded do
+		TriggerServerEvent("master_identity:GetData")
+		Citizen.Wait(5000)
+	end
 end)
 
 RegisterNetEvent('esx_identity:alreadyRegistered')
 AddEventHandler('esx_identity:alreadyRegistered', function()
+	viewLoaded = true
 	mk32_debug_clogger("Already registered")
 	TriggerEvent('esx_skin:playerRegistered')
 end)
@@ -42,6 +51,10 @@ AddEventHandler('esx_identity:showRegisterIdentity', function()
 	mk32_debug_clogger("Show GUI")
 	finished = true
 	EnableGui(true)
+end)
+
+RegisterNUICallback("UILoaded", function(data)
+	viewLoaded = true
 end)
 
 RegisterNUICallback('register', function(data, cb)

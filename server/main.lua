@@ -6,7 +6,12 @@ AddEventHandler('esx:playerLoaded', function(playerId, xPlayer)
 	mk32_debug_logger("Master Identity starting ...")
 	Citizen.Wait(1000)
 	checkIdentity(xPlayer)
-	Citizen.Wait(1000)
+end)
+
+RegisterNetEvent('master_identity:GetData')
+AddEventHandler('master_identity:GetData', function()
+	local xPlayer = ESX.GetPlayerFromId(source)
+	checkIdentity(xPlayer)
 end)
 
 function checkIdentity(xPlayer)
