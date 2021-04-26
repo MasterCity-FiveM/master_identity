@@ -47,10 +47,10 @@ function checkIdentity(xPlayer)
 end
 
 ESX.RegisterServerCallback('esx_identity:registerIdentity', function(source, cb, data)
-	ESX.RunCustomFunction("anti_ddos", source, 'esx_identity:registerIdentity', {data = data})
 	mk32_debug_logger("esx_identity:registerIdentity starting ...")
 	local xPlayer = ESX.GetPlayerFromId(source)
 	if xPlayer then
+		ESX.RunCustomFunction("anti_ddos", xPlayer.source, 'esx_identity:registerIdentity', {})
 		if xPlayer.verified == '0' then
 			mk32_debug_logger("Checking form submit!")
 			if data.step and data.step == 'one' and checkPhoneFormat(data.phone) then

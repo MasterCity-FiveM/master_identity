@@ -80,20 +80,6 @@ RegisterNUICallback('register', function(data, cb)
 	end, data)
 end)
 
-RegisterNUICallback('register', function(data, cb)
-	ESX.TriggerServerCallback('esx_identity:registerIdentity', function(callback)
-		if callback then
-			-- ESX.ShowNotification(_U('thank_you_for_registering'))
-			EnableGui(false)
-			TriggerEvent('esx_skin:playerRegistered')
-			TriggerEvent('mskincreator:loadMenu')
-			Wait(1000)
-		else
-			ESX.ShowNotification(_U('registration_error'))
-		end
-	end, data)
-end)
-
 Citizen.CreateThread(function()
 	while finished do
 		Citizen.Wait(0)
