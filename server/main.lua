@@ -43,7 +43,7 @@ end
 ESX.RegisterServerCallback('esx_identity:registerIdentity', function(source, cb, data)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	if xPlayer then
-		ESX.RunCustomFunction("anti_ddos", xPlayer.source, 'esx_identity:registerIdentity', {})
+		--ESX.RunCustomFunction("anti_ddos", xPlayer.source, 'esx_identity:registerIdentity', {})
 		if xPlayer.verified == '0' and data ~= nil and data.firstname ~= nil and data.lastname ~= nil and data.sex ~= nil and checkNameFormat(data.firstname) and checkNameFormat(data.lastname) and checkSexFormat(data.sex) then
 			currentIdentity = {
 				firstName = formatName(data.firstname),
