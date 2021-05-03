@@ -21,8 +21,13 @@ end)
 RegisterNetEvent('esx_identity:alreadyRegistered')
 AddEventHandler('esx_identity:alreadyRegistered', function()
 	viewLoaded = true
-	mk32_debug_clogger("Already registered")
 	TriggerEvent('esx_skin:playerRegistered')
+end)
+
+RegisterNetEvent('esx_identity:showRegisterIdentity')
+AddEventHandler('esx_identity:showRegisterIdentity', function()
+	finished = true
+	EnableGui(true)
 end)
 
 AddEventHandler('esx:loadingScreenOff', function()
@@ -39,45 +44,31 @@ function EnableGui(state)
 	})
 end
 
-RegisterNetEvent('mk_idnt_error')
-AddEventHandler('mk_idnt_error', function(action)
-	SendNUIMessage({
-		type = action
-	})
-end)
-
-RegisterNetEvent('esx_identity:showRegisterIdentity')
-AddEventHandler('esx_identity:showRegisterIdentity', function()
-	mk32_debug_clogger("Show GUI")
-	finished = true
-	EnableGui(true)
-end)
-
-RegisterNUICallback("UILoaded", function(data)
-	viewLoaded = true
-end)
-
 RegisterNUICallback('register', function(data, cb)
-	mk32_debug_clogger("Start esx_identity:registerIdentity from client")
 	ESX.TriggerServerCallback('esx_identity:registerIdentity', function(callback)
-		mk32_debug_clogger("Get submit!")
 		if callback then
-			mk32_debug_clogger("Registered!")
 			-- ESX.ShowNotification(_U('thank_you_for_registering'))
 			exports.pNotify:SendNotification({text = "به سرور مَسترسیتی خوش آمدید.", type = "success", timeout = 30000})
 			finished = false
 			EnableGui(false)
-			mk32_debug_clogger("Load ESX Skin!")
+			
 			TriggerEvent('esx_skin:playerRegistered')
-			mk32_debug_clogger("Load MSkinCreator!")
+			Wait(100)
+			Location = math.random(1,7)
+			ESX.Game.Teleport(PlayerPedId(), Config.SpawnPoint[Location].postion, function()
+				SetEntityHeading(PlayerPedId(), Config.SpawnPoint[Location].heading)
+			end)
 			TriggerEvent('mskincreator:loadMenu')
 			Wait(1000)
 		else
-			mk32_debug_clogger("Register error")
 			ESX.ShowNotification(_U('registration_error'))
 			Wait(1000)
 		end
 	end, data)
+end)
+
+RegisterNUICallback("UILoaded", function(data)
+	viewLoaded = true
 end)
 
 Citizen.CreateThread(function()
@@ -109,9 +100,3 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
-
-function mk32_debug_clogger(str)
-	if Config.EnableDebugging then
-		print(str)
-	end
-end

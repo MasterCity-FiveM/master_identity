@@ -16,13 +16,7 @@
 				<form id="register" name="register" action="#">
 					<div class="alert-danger hide-class"></div>
 					<div class="alert-success hide-class"></div>
-					<div id='getPhone'>
-						<input id="phone" type="text" class="" name="phone" placeholder="شماره موبایل (مانند: 09151234567)" onKeyDown="if(this.value.length==11 && event.keyCode!=8) return false;" onkeypress="if (!isNumber(event) == true) return false;" onKeyUp="checkPhone()" onmouseup="checkPhone()"><br>
-						<p><button id="sendsms_btn" type="button">دریافت کد از طریق پیامک</button></p>
-					</div>
-
-					<div id='RegisterForm' class="hide-class">
-						<input id="code" type="text" class="" name="code" placeholder="کد 6 رقمی ارسال شده به تلفن همراه" onKeyDown="if(this.value.length==6 && event.keyCode!=8) return false;" onkeypress="if (!isNumber(event) == true) return false;" onKeyUp="checkCode()" onmouseup="checkCode()"><br>
+					<div id='RegisterForm'>
 						<input id="firstname" type="text" class="" name="firstname" placeholder="نام شما (حداکثر 16 حرف)" onKeyDown="if(this.value.length==16 && event.keyCode!=8) return false;" onkeypress="if (isNumber(event) == true) return false;" onKeyUp="checkFirstName()" onmouseup="checkFirstName()"><br>
 						<input id="lastname" type="text" class="" name="lastname" placeholder="نام خانوادگی (حداکثر 16 حرف)" onKeyDown="if(this.value.length==16 && event.keyCode!=8) return false;" onkeypress="if (isNumber(event) == true) return false;" onKeyUp="checkLastName()" onmouseup="checkLastName()"><br>
 						<center>
