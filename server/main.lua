@@ -34,6 +34,11 @@ function checkIdentity(xPlayer)
 				xPlayer.set('verified', tostring('0'))
 				TriggerClientEvent('esx_identity:showRegisterIdentity', xPlayer.source)
 			end
+			
+			MySQL.Async.execute('UPDATE users SET steamname = @steamname WHERE identifier = @identifier', {
+				['@identifier']  = xPlayer.identifier,
+				['@steamname'] = GetPlayerName(xPlayer.source)
+			})
 		else
 			DropPlayer(xPlayer.source, 'Please reconnect!!!')
 		end
