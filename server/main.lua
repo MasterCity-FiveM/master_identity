@@ -3,17 +3,26 @@ TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(playerId, xPlayer)
+	local _source = source
 	Citizen.Wait(1000)
-	checkIdentity(xPlayer)
+	checkIdentity(xPlayer, _source)
 end)
 
 RegisterNetEvent('master_identity:GetData')
 AddEventHandler('master_identity:GetData', function()
-	local xPlayer = ESX.GetPlayerFromId(source)
-	checkIdentity(xPlayer)
+	local _source = source
+	local xPlayer = ESX.GetPlayerFromId(_source)
+	checkIdentity(xPlayer, _source)
 end)
 
-function checkIdentity(xPlayer)
+function checkIdentity(xPlayer, src)
+	if xPlayer == nil then
+		if src ~= nil then
+			DropPlayer(src, 'Please reconnect!!!')
+		end
+		
+		return
+	end
 	MySQL.Async.fetchAll('SELECT firstname, lastname, dateofbirth, sex, height, phone, verified FROM users WHERE identifier = @identifier', {
 		['@identifier'] = xPlayer.identifier
 	}, function(result)
