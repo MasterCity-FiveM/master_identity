@@ -39,6 +39,8 @@ function checkIdentity(xPlayer, src)
 				Citizen.Wait(1000)
 				TriggerClientEvent('esx_identity:alreadyRegistered', xPlayer.source)
 				TriggerClientEvent("pNotify:SendNotification", xPlayer.source, { text = "از ورود مجدد شما خرسندیم، امیدواریم لحظات خوبی داشته باشید.", type = "info", timeout = 15000, layout = "bottomCenter"})
+				-- bayad badan pak beshe
+				TriggerClientEvent("pNotify:SendNotification", xPlayer.source, { text = "ایونت فعال با جوایز 500، 400 و 300 تومانی، اطلاعات بیشتر در دیسکورد!", type = "info", timeout = 45000, layout = "bottomCenter"})
 			else
 				xPlayer.set('verified', tostring('0'))
 				TriggerClientEvent('esx_identity:showRegisterIdentity', xPlayer.source)

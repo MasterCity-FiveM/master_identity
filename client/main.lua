@@ -49,6 +49,9 @@ RegisterNUICallback('register', function(data, cb)
 		if callback then
 			-- ESX.ShowNotification(_U('thank_you_for_registering'))
 			exports.pNotify:SendNotification({text = "به سرور مَسترسیتی خوش آمدید.", type = "success", timeout = 30000})
+			exports.pNotify:SendNotification({text = "با مراجعه به دیسکورد، از آخرین اخبار و ایونت ها با خبر شوید.", type = "success", timeout = 30000})
+			-- bayad pak she badan
+			exports.pNotify:SendNotification({text = "ایونت فعال: پول اوسی با مبالغ 500 تومان، 400 تومان، 300 تومان.", type = "success", timeout = 30000})
 			finished = false
 			EnableGui(false)
 			
